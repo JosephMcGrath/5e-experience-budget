@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>XP Calculator</title>
+
+    <link rel="shortcut icon" type="image/jpg" href="/favicon.ico" />
+
+    <link rel="stylesheet" href="/bootstrap/bootstrap.css'">
+    <script defer src="/bootstrap/bootstrap.bundle.js"></script>
+
+    <style>
+        body {
+            background-color: #202020;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="the_target">This app requires JavaScript.</div>
+
+    <script type="module">
+        import { ExperienceCalculator } from "/js/experience_calculator.js";
+
+        var page = new ExperienceCalculator("the_target");
+        page.init();
+    </script>
+</body>
