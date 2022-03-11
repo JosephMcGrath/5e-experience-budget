@@ -2,52 +2,66 @@
 class Party {
 
     constructor() {
-        this.players = {};
+        this.playerGroups = [];
     }
 
+    /**
+     * @param {Number} level 
+     */
     validateLevel(level) {
+        let parsedValue = parseInt(level);
+        if (isNaN(parsedValue)) {
+            throw new Error("Input wasn't a number:", level)
+        }
         if (level < 1) {
-            throw "Level cannot be less than 1.";
+            throw new Error("Level cannot be less than 1.");
         }
         if (level > 20) {
-            throw "Level cannot be more than 20.";
+            throw new Error("Level cannot be more than 20.");
         }
-
     }
 
-    setPlayerCount(level, count) {
-        this.validateLevel(level);
-        if (count === 0) {
-            delete this.players[level];
-        }
-        this.players[level] = count;
-    }
-
-    addPlayer(level, count = 1) {
+    /**
+     * @param {Number} level
+     * @param {Number} count
+     */
+    addPlayerGroup(level = 1, count = 1) {
         level = parseInt(level);
         count = parseInt(count);
         this.validateLevel(level);
-        if (level in this.players) {
-            this.players[level] += count;
-        } else {
-            this.players[level] = count;
-        }
+
+        this.playerGroups.push({
+            level,
+            count,
+        });
     }
 
-    removePlayer(level, count = 1) {
-        if (!level in this.players) {
-            return;
-        }
-
-        this.players[level] -= count;
-        if (this.players[level] < 1) {
-            delete this.players[level];
-        }
+    /**
+     * @param {Number} index
+     */
+    removePlayerGroup(index) {
+        this.playerGroups.splice(index, 1)
     }
 
 
     clearPlayers() {
-        this.players = {};
+        this.playerGroups = [];
+    }
+
+
+    /**
+     * A lookup of the number of players at each level.
+     */
+    get playersAtLevel() {
+        let output = {};
+        for (let theGroup of this.playerGroups) {
+            if (theGroup.level in output) {
+                output[theGroup.level] += theGroup.count;
+            } else {
+                output[theGroup.level] = theGroup.count;
+            }
+        }
+        return output;
     }
 
 
@@ -58,14 +72,25 @@ class Party {
             'hard': 0,
             'deadly': 0,
         };
-        for (const theLevel in this.players) {
-            let thresholds = this.levelDifficultyThresholds[theLevel];
-            const playerCount = this.players[theLevel];
+
+        for (const theGroup of this.playerGroups) {
+            const thresholds = this.levelDifficultyThresholds[theGroup.level];
+            const playerCount = theGroup.count;
+
             for (const theDifficulty in output) {
                 output[theDifficulty] += thresholds[theDifficulty] * playerCount;
             }
         }
         return output;
+    }
+
+
+    get totalPlayers() {
+        let count = 0;
+        for (const theGroup of this.playerGroups) {
+            count += theGroup.count;
+        }
+        return count;
     }
 
 

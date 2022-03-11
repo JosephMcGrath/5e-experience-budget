@@ -5,13 +5,13 @@ class Encounter {
 
     /**Multipliers for this many or more monsters in the encounter. */
     monsterDifficultyMultiplier = {
-        0: 0.5,
-        1: 1,
-        2: 1.5,
-        3: 2,
-        7: 2.5,
-        11: 3,
-        15: 4
+        0: { monsterCount: 0, multiplier: 0.5 },
+        1: { monsterCount: 1, multiplier: 1 },
+        2: { monsterCount: 2, multiplier: 1.5 },
+        3: { monsterCount: 3, multiplier: 2 },
+        4: { monsterCount: 7, multiplier: 2.5 },
+        5: { monsterCount: 11, multiplier: 3 },
+        6: { monsterCount: 15, multiplier: 4 },
     }
 
     /**
@@ -21,6 +21,7 @@ class Encounter {
     constructor(name, party) {
         this.displayName = name;
         this.party = party;
+        /** @type {Array<Monster>} */
         this.monsters = [];
     }
 
@@ -37,8 +38,7 @@ class Encounter {
      * @param {String}
      */
     set name(displayName) {
-        this.displayName = displayName.trim();
-        console.log(this.displayName);
+        this.displayName = displayName;
     }
 
 
@@ -56,14 +56,10 @@ class Encounter {
 
 
     /**
-     * @param {Monster} toRemove
+     * @param {Number} index
      */
-    removeMonster(toRemove) {
-        for (let theMonster in this.monsters) {
-            if (this.monsters[theMonster] === toRemove) {
-                this.monsters.splice(theMonster, 1);
-            }
-        }
+    removeMonster(index) {
+        this.monsters.splice(index, 1);
     }
 
 
@@ -93,25 +89,58 @@ class Encounter {
     get difficultyMultiplier() {
         let multiplier = 1;
         const monsterCount = this.monsterCount;
-        for (const key in this.monsterDifficultyMultiplier) {
-            const monsterThreshold = parseInt(key);
-            if (monsterThreshold > monsterCount) {
+        let key = 0;
+        for (key in this.monsterDifficultyMultiplier) {
+            const data = this.monsterDifficultyMultiplier[key];
+            if (data.monsterCount > monsterCount) {
+                key = parseInt(key);
                 break;
             }
-            multiplier = this.monsterDifficultyMultiplier[key];
         }
+
+        if (this.party.totalPlayers < 3 & key < 6) {
+            key += 1;
+        } else if (this.party.totalPlayers >= 6 & key > 0) {
+            key -= 1;
+        }
+        multiplier = this.monsterDifficultyMultiplier[key].multiplier;
+
         return multiplier;
     }
 
     /**
-     * @returns {Number} Total count of monsters in this encounter.
+     * @returns {Number} Total count of monsters in this encounter .
      */
     get monsterCount() {
         let count = 0;
+        let averageCR = this.averageCR;
         for (const monsterGroup of this.monsters) {
-            count += monsterGroup.count;
+            if (monsterGroup.numericCR >= (averageCR - 2)) {
+                count += monsterGroup.count;
+            }
         }
         return count;
+    }
+
+
+    /**
+     * @returns {Number} Average experience of monsters in the encounter.
+     * 
+     * Used to resolve this part of step 4: 'don't count any monsters whose
+     * challenge rating is significantly below the average challenge rating of
+     * the other monsters in the group'
+     */
+    get averageCR() {
+        let total = 0;
+        let count = 0;
+        for (const monsterGroup of this.monsters) {
+            total += monsterGroup.numericCR * monsterGroup.count;
+            count += monsterGroup.count;
+        }
+        if (count == 0) {
+            return 0;
+        }
+        return total / count;
     }
 
 

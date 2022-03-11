@@ -40,6 +40,12 @@ class Monster {
     };
 
 
+    /**
+     * 
+     * @param {String} name 
+     * @param {String} challengeRating 
+     * @param {Number} count 
+     */
     constructor(name, challengeRating, count) {
         this.displayName = name;
         this.challengeRating = challengeRating;
@@ -48,6 +54,17 @@ class Monster {
 
     get experience() {
         return this.count * this.challengeRatingExperience[this.challengeRating];
+    }
+
+    /**
+     * @returns {Number}
+     */
+    get numericCR() {
+        if (this.challengeRating.includes("/")) {
+            return 1 / parseFloat(this.challengeRating.slice(2, 3));
+        } else {
+            return parseFloat(this.challengeRating);
+        }
     }
 }
 

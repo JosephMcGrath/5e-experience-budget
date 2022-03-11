@@ -20,13 +20,17 @@
     </style>
 </head>
 
+
 <body>
-    <div id="the_target">This app requires JavaScript.</div>
+
+    <div id="app">
+        <calculator></calculator>
+    </div>
 
     <script type="module">
-        import { ExperienceCalculator } from "/js/experience_calculator.js";
+        import { makeAdventureDayCalculator } from "/js/experience_calculator.js";
 
-        var page = new ExperienceCalculator("the_target");
-        page.init();
+        makeAdventureDayCalculator('#app');
+
     </script>
 </body>

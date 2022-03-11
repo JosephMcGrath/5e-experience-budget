@@ -4,6 +4,7 @@ import { Party } from "./party.js"
 class AdventureDay {
     constructor() {
         this.party = new Party();
+        /** @type {Array<Encounter>} */
         this.encounters = [];
     }
 
@@ -40,20 +41,17 @@ class AdventureDay {
     }
 
     /**
-     * @param {Encounter} toRemove
+     * @param {Number} index
      */
-    removeEncounter(toRemove) {
-        for (let theEncounter in this.encounters) {
-            if (this.encounters[theEncounter] === toRemove) {
-                this.encounters.splice(theEncounter, 1);
-            }
-        }
+    removeEncounter(index) {
+        this.encounters.splice(index, 1);
     }
 
     get experienceBudget() {
         let budget = 0;
-        for (const level in this.party.players) {
-            budget += this.adventuringDayExperience[level] * this.party.players[level];
+        const players = this.party.playersAtLevel;
+        for (const level in players) {
+            budget += this.adventuringDayExperience[level] * players[level];
         }
         return budget;
     }
@@ -61,13 +59,64 @@ class AdventureDay {
     get totalExperience() {
         let total = 0;
         for (const theEncounter of this.encounters) {
-            total += theEncounter.totalModifiedExperience;
+            total += theEncounter.totalExperience;
         }
         return total;
     }
 
     get remainingBudget() {
         return this.experienceBudget - this.totalExperience;
+    }
+
+    get data() {
+        let output = {
+            "meta": {
+                "version": "2.0",
+                "exported": new Date().toISOString(),
+            },
+            "party": this.party.playerGroups,
+            "encounters": [],
+        };
+
+        for (let theEncounter of this.encounters) {
+            let encounterData = {
+                "name": theEncounter.name,
+                "monsters": [],
+            };
+
+            for (let theMonster of theEncounter.monsters) {
+                encounterData["monsters"].push({
+                    "name": theMonster.displayName,
+                    "cr": theMonster.challengeRating,
+                    "count": theMonster.count,
+                });
+            }
+
+            output["encounters"].push(encounterData);
+        }
+
+        return output;
+    }
+
+    static fromObject(data) {
+        let theDay = new AdventureDay();
+
+        for (const theGroup of data.party) {
+            theDay.party.addPlayerGroup(theGroup.level, theGroup.count);
+        }
+
+        for (const encounterData of data.encounters) {
+            let theEncounter = theDay.addEncounter(name = encounterData.name);
+            for (const monsterData of encounterData.monsters) {
+                let theMonster = theEncounter.addMonster(
+                    monsterData.name,
+                    monsterData.cr,
+                    monsterData.count,
+                );
+            }
+        }
+
+        return theDay;
     }
 }
 
