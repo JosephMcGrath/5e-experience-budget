@@ -21,6 +21,11 @@ export default {
         displayAverageCR() {
             return Math.round(10 * this.encounterData.averageCR) / 10;
         },
+        difficultyDescription(){
+            let rating = this.encounterData.difficultyRating;
+
+            return `${rating["difficulty"]}, ${Math.round(rating["%"] * 100)}%`
+        }
     },
     methods: {
         addMonster() {
@@ -35,7 +40,7 @@ export default {
     <div class="container border border-light border-2 rounded-3 my-2 p-2">
         Encounter: <input v-model=encounterData.name v-bind:placeholder="placeholderName" class="form-text">
         <div>
-        Total experience: {{encounterData.totalModifiedExperience}} modified XP (<b>{{encounterData.difficultyRating}}</b>).
+        Total experience: {{encounterData.totalModifiedExperience}} modified XP (<b>{{difficultyDescription}})</b>).
         </div>
 
         <div class="container">
@@ -48,7 +53,7 @@ export default {
 
         <button @click="removeSelf" class="btn btn-danger">-Encounter</button>
 
-        <button data-bs-toggle="collapse" v-bind:data-bs-target="detailsIDRef" type="button" class="btn btn-info mx-2">Details</button>
+        <button data-bs-toggle="collapse" v-bind:data-bs-target="detailsIDRef" type="button" class="btn btn-secondary btn-sm mx-2">Details</button>
         <div class="collapse" v-bind:id="detailsID">
             <ul>
                 <li>Unmodified experience: {{encounterData.totalExperience}}xp</li>

@@ -41,7 +41,7 @@ export default {
 
     <button @click="addPlayerGroup" class="btn btn-success">+Level</button>
     
-    <button data-bs-toggle="collapse" data-bs-target="#partyDetails" type="button" class="btn btn-info mx-2">Details</button>
+    <button data-bs-toggle="collapse" data-bs-target="#partyDetails" type="button" class="btn btn-secondary btn-sm mx-2">Details</button>
     <div class="collapse" id="partyDetails">
         <table class="table text-light">
             <thead>

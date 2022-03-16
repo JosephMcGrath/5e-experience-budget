@@ -133,7 +133,7 @@ class Party {
             'deadly': 1400
         },
         7: {
-            'easy': 3500,
+            'easy': 350,
             'medium': 750,
             'hard': 1100,
             'deadly': 1700

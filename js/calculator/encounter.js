@@ -145,20 +145,52 @@ class Encounter {
 
 
     /**
-     * @returns {String} The difficulty description of this encounter.
+     * @returns {Object<String, String>} The difficulty description of this encounter.
      */
     get difficultyRating() {
         const experience = this.totalModifiedExperience;
         const thresholds = this.party.experienceThresholds;
-        let output = "Effortless";
+        let theRating = "effortless";
+
         for (const difficulty in thresholds) {
             if (thresholds[difficulty] > experience) {
                 break;
             }
-            output = difficulty;
+            theRating = difficulty;
         }
+
+        let output = {
+            "difficulty": theRating,
+            "%": 0,
+        }
+
+        switch (theRating) {
+            case "effortless":
+                output["difficulty"] = "Effortless";
+                output["%"] = experience / thresholds["easy"];
+                break;
+            case "easy":
+                output["difficulty"] = "Easy";
+                output["%"] = (experience - thresholds["easy"]) / (thresholds["medium"] - thresholds["easy"]);
+                break;
+            case "medium":
+                output["difficulty"] = "Medium";
+                output["%"] = (experience - thresholds["medium"]) / (thresholds["hard"] - thresholds["medium"]);
+                break;
+            case "hard":
+                output["difficulty"] = "Hard";
+                output["%"] = (experience - thresholds["hard"]) / (thresholds["deadly"] - thresholds["hard"]);
+                break;
+            case "deadly":
+                output["difficulty"] = "Deadly";
+                output["%"] = experience / thresholds["deadly"];
+                break;
+
+        }
+
         return output;
     }
+
 }
 
 export { Encounter };
