@@ -1,5 +1,4 @@
-// import {createApp} from "../vue/vue.esm-browser.prod.js";
-import { createApp } from "../vue/vue.esm-browser.js";
+import { createApp } from "../vue/vue.esm-browser.prod.js";
 
 import Calculator from "./render/main.js"
 
